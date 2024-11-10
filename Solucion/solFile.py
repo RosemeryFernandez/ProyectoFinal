@@ -34,5 +34,26 @@ df['dias_mora'] = df.apply(lambda row: calcular_dias_mora(row['Fecha'], row['Fec
 
 print(df[['ID Contrato', 'Fecha', 'Fecha_de_Pago_Aplicado', 'dias_mora']].head())
 
+#2) Calculo del saldo insoluto en la fecha corte
+
+# Convertir las columnas de fechas a tipo datetime
+df['Fecha'] = pd.to_datetime(df['Fecha'])
+df['Fecha_de_Pago_Aplicado'] = pd.to_datetime(df['Fecha_de_Pago_Aplicado'], errors='coerce')  # 'coerce' para valores inválidos
+
+print(df[['Fecha', 'Fecha_de_Pago_Aplicado']].head())
+
+# Definir la fecha de corte
+fecha_corte = datetime(2024, 10, 15)
+
+# Filtrar las filas hasta la fecha de corte
+df_filtrado = df[df['Fecha_de_Pago_Aplicado'] <= fecha_corte]
+
+# Agrupar por ID_contrato y obtener el saldo insoluto
+saldo_insoluto = df_filtrado.groupby('ID Contrato').agg(saldo_insoluto=('Saldo Final', 'last') ) # Tomamos el último saldo insoluto registrado por cada cliente
+
+# Ver los resultados
+print(saldo_insoluto.head())
+
+
 
 
